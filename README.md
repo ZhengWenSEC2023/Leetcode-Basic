@@ -4,7 +4,8 @@
 
 Begin from 9/29/2020
 
-Checkpoint: 
+Checkpoint:
+
 - 9/29/2020 √
 - 9/30/2020 √
 - 10/1/2020 √
