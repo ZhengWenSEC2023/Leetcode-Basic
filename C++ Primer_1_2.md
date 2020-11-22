@@ -33,6 +33,7 @@
         if (1)
         ```
     - 负数signed被赋值为unsigned的时候，unsigned会自动取模。
+    - unsigned 用在条件表达式中，如果表达式中含有负值，负值会转换为unsigned. (s.size() < n) (int n = -1;)
         ```C++
         unsigned u = 10;
         int i = -42;
@@ -212,6 +213,12 @@
       // i, j 必须定义在函数体外，否则内存不固定，不可以用constexpr指针指向。（static变量除外）
       constexpr const int *p = &i;   // p 是常量指针，指向整形常量 i
       constexpr int *p1 = &j;        // p1 是常量指针，指向整数 j  
+      ```
+    - **constexpr 可以用来初始化数组**
+      ```C++
+      constexpr unsigned sz = 42;
+      int *pz[sz];
+      string strs[get_size()]; // 当且仅当 get_size() 是 constexpr
       ```
     - 类型别名：typedef, alias declaration
       ```C++
