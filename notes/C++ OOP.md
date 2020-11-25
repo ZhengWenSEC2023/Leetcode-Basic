@@ -637,3 +637,203 @@
 - 重载operator new, operator new[], operator delete and operator delete[]
 
 记得回来补
+
+- 右值引用
+  定义：When right-hand side of an assignment is an rvalue, then the left-hand side object can steal resources from the right-hand side rather than performing a separate allocation, thus enabling move semantics.
+  赋值语句的右端是一个右值的话，左手边的对象可以偷来对象的值，而不是重新分配一块空间
+  - Lvalue: 可以出现在operator=左侧的对象
+  - Rvalue: 只能出现在operator=右侧的对象
+    - 临时对象是右值。简单来说，右值对象没有名称
+  ```C++
+  // int test
+  int a = 9; 
+  int b = 4;
+  a = b // ok
+  b = a // ok
+  a = a + b // ok
+  a + b = 42 // error
+
+  //string test
+  string s1("Hello");
+  string s2("World");
+  s1 + s2 = s2;     //通过编译
+  cout << "s1:" << s1 << endl;  // s1: Hello
+  cout << "s2:" << s2 << endl;  // s2: World
+  string() = "World";           // 可以对临时变量赋值
+
+  // complex test 
+  complex<int> c1(3, 8), c2(1, 0);
+  c1 + c2 = complex<int>(4, 9);  // 通过编译
+  cout << "c1:" << c1 << endl;   // c1: (3, 8)
+  cout << "c2:" << c2 << endl;   // c2: (1, 0)
+  complex<int>() = complex<int>(4, 9); //可以对临时变量赋值
+  ```
+  - 不可以对Rvalue取reference
+  - C++认为，当右值出现在operator=的右侧的时候，认为对其资源进行偷取/搬移而非拷贝是可以的。要求：
+    1. 必须有语法让我们在调用端告诉编译器，这是一个Rvalue
+    2. 必须有语法让我们在被调用端写出一个专门处理Rvalue的所谓的move assignment函数
+    ```C++
+    insert(..., &&x) // 本来是右值
+    ```
+  - 保持右值对象的空间不变，将左值的指针指向右值对象，原本右值对象不能再调用自己的值，所有权发生变化
+  - **std::move**
+    - 可以传左值，将传进函数的对象变成右值引用，并将左边的地址指向右边的对象。必须确保后续不会再调用传进函数的参数。
+    ```C++
+    M c1(c);
+    M c2(std::move(c1));
+    ```
+  - **perfect forwarding**: perfect forwarding allows you to write a single function template that takes n arbitrary arguments and forwards them transparently to another arbitrary function. The nature of the argument (modifiable, const, lvalue or rvalue) is preserved in this forwarding process.
+  - **unperfect forwarding**: 
+    ```C++
+    void process(int& i) {
+        cout << "process(int&): " << i << endl;
+    }
+    void process(int&& i) {
+        cout << "process(int&&):" << i << endl;
+    }
+    
+    int a = 0;
+    process(a);     // process(int&): 0 变量被视为lvalue
+    process(1);     // process(int&&): 1 temp object被视为Rvalue处理
+    process(std::move(a)); // process(int&&): 0 强制将a由Lvalue改为Rvalue
+
+    void forward(int&& i) {  // 相当于中介，变量经forward再传给process
+        cout << "forward(int&&): " << i << ", ";
+        process(i);
+    }
+
+    forward(2);     // forward(int&&): 2, process(int&): 2 
+    // Rvalue 经由forward() 传给另一个函数却变成了Lvalue.
+    // 原因是传递过程中，它变成了一个named object
+    forward(move(a)); // forward(int&&): 0, process(int&): 0
+    // 出错
+    forward(a);       // Error: cannot bind 'int' lvalue to 'int&&'
+    const int& b = 1;
+    process(b);       // Error: no matching function for call to 'process(const int&)'
+    process(move(b)); // Error: no matching function for call to 'process(std::remove_reference<const int&>::type'
+    int& x(5)         // Error: invalid initialization of non-const reference of type 'int&' from an rvalue of type 'int' 
+    ```
+  - perfect Forwarding: STL
+    ```C++
+    template<typename _Tp> constexpr _Tp&& forward(typename std::remove_reference<_Tp>::type& __t) noexcept { return static_cast<_Tp&&>(__t); }
+    template<typename _Tp> constexpr _Tp&& forward(typename std::remove_reference<_Tp>::type&& __t) noexcept {
+        static_assert(!std::is_lvalue_reference<_Tp>::value, "template argument substituting _Tp is an lvalue reference type");
+        return static_cast<_Tp&&>(__t);
+    }
+    template<typename _Tp> constexpr typename std::remove_reference<_Tp>::type&& move(_Tp&& __t) noexcept { return static_cast<typename std::remove_reference<_Tp>::type&&>(__t); }
+    ```
+  - move-aware class
+  ```C++
+  class MyString{
+  public:
+    static size_t DCtor;    // default-ctor 次数
+    static size_t Ctor;     // ctor 次数
+    static size_t CCtor;    // copy-ctor 次数
+    static size_t CAsgn;    // copy-asgn 次数
+    static size_t MCtor;    // move-ctor 次数
+    static size_t MAsgn;    // move-asgn 次数
+    static size_t Dtor;     // dtor 次数
+  private:
+    char* _data;
+    size_t _len;
+    void _init_data(const char *s) {
+        _data = new char[_len + 1];
+        memcpy(_data, s, _len);
+        _data[len] = '\0';
+    }
+  public:
+    // default constructor
+    MyString() ： _data(NULL), _len(0) {++DCtor;}
+
+    // constructor
+    MyString(const char* p) : _len(strlen(p)) {
+        ++Ctor;
+        _init_data(p);
+    }
+
+    // copy constructor
+    MyString(const MyString& str) : _len(str._len) {
+        ++CCtor;
+        _init_data(str.data);
+    }
+    
+    // move constructor
+    MyString(MyString&& str) noexcept : _data(str._data), _len(str._len) {
+        ++MCtor;
+        str._len = 0;
+        str._data = NULL;  // 重要
+    }
+    MyString& operator=(const MyString& str) {
+        ++CAsgn;
+        if (this == &str) {
+            return *this;
+        }
+        delete[] _data;
+        _init_data(str._data);
+        _len = str._len;
+        return *this;
+    }
+    // move assignment
+    MyString& operator=(MyString&& str) noexcept {
+        ++MAsgn;
+        if (this != &str) {
+            if (_data) 
+                delete[] _data;
+            _len = str._len;
+            _data = str._data;  // MOVE
+            str._len = 0;
+            str._data = NULL;   // 重要，要打断pointer到原对象的指针，否则局部变量生命周期结束后，调用析构函数会杀掉原来的对象
+        }
+        return *this; 
+    }
+
+    // dtor
+    virtual ~MyString() {
+        ++Dtor;
+        if(_data) {
+            delete[] _data;    // 如果没有打断，这里在局部变量生命周期结束之后，将原对象杀掉。如果是NULL，什么都不用做
+        }
+    }
+  }
+  // 注意局部对象死亡的时候也会调用析构函数
+  bool operator<(const MyString& rhs) const {
+      return string(this->data) < string(rhs._data);
+  }
+  bool operator==(const MyString& rhs) const {
+      return string(this->data) == string(rhs._data);
+  }
+  char* get() const { return _data; }
+  size_t MyString::DCtor = 0;
+  size_t MyString::Ctor = 0;
+  size_t MyString::CCtor = 0;
+  size_t MyString::CAsgn = 0;
+  size_t MyString::MCtor = 0;
+  size_t MyString::MAsgn = 0;
+  size_t MyString::Dtor = 0;
+  namespace std {
+      template<> struct hash<MyString> {
+          size_t operator() (const MyString& s) const noexcept {
+              return hash<string>() (string(s.get()));
+          }
+      }
+  }
+
+  #include <typeinfo>
+  template<typename T> void output_static_data(const T& myStr) {
+      cout << typeid(myStr).name() << "--" << endl;
+      cout << "CCtor=" << T::CCtor 
+           << "MCtor=" << T::MCtor
+           << "CAsgn=" << T::CAsgn
+           << "MAsgn=" << T::MAsgn
+           << "Dtor=" << T::Dtor
+           << "Ctor=" << T::Ctor
+           << "DCtor=" << T::DCtor
+           << endl;
+  }
+  template<typename M, typename NM> void test_moveable(M c1, NM c2, long& value){
+      char buf[10];
+      typedef typename iterator_traits<typename M::iterator>::value_type
+  }
+  ```
+  ![Alt text](img/OOP_r_reference.png)
+  
