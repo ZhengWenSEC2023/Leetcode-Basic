@@ -458,7 +458,7 @@
 - OOP例子： Composit
 - 容器里面放内容一定要一样大小，但组合模式里面的对象不一定大小相同，所以只能放指针
 - 子类对象转化为父类对象需要强制类型转换，而子类对象指针可以自动转化为父类指针
-  ！[Alt text](img/OOP_Composit.png)
+  ![Alt text](img/OOP_Composit.png)
   ```C++
   class Component {
       int value;
@@ -488,9 +488,12 @@
   ```C++
   class Fraction {
   public:
-    Fraction(int num, int den = 1) : m_numerator(num), m_denominator(den) {}
+    Fraction(int num, int den = 1) : m_numerator(num), m_denominator(den) {}  // non-explicit-one-argument ctor
     operator double() const {   // 将Fraction类转换成double类，不需要返回值
         return ((double)m_numerator / m_denominator)
+    }
+    Fraction operator+ (const Fraction& f) {
+        return Fraction(...);
     }
   private:
     int m_numerator;
@@ -498,5 +501,139 @@
   }
 
   Fraction f(3, 5);
-  double d = 4 +f;
+  double d = 4 + f  // 此时调用类型转换，想办法把Fraction变成double()，调用定义的operator double()，此时 + 作用在double上，后面再调用operator double()转换类型。如果变成
+  // double = f + 4, 此时operator+会与 Fraction(num, den = 1)产生二义性，报错
   ```
+  ```C++
+  class Fraction {
+  public: 
+    Fraction(int num, int den = 1) : m_numerator(num), m_denominator(den) {}
+    Fraction operator+(const Fraction& f) {
+        return Fraction(...);
+    }
+  private:
+    int m_numerator;
+    int m_denominator;
+  }
+  Fraction f(3, 5);
+  Fraction d2 = f + 4; //此时编译器会想办法把4变成Fraction类, 调用Fraction(4, 1);
+  // 如果两个同时存在，会发生二义性，报错
+  ```
+- **explicit关键字：取消隐式调用，只能显式调用**
+- pointer-like class, 智能指针
+  ```C++
+  template<class T> class shared_ptr {
+  public:
+    T& operator*() const { return *px; }
+    T& operator->() const { return px; }
+    shared_ptr(T* p) : px(p) {}  //将天然指针变成智能指针
+  private:
+    T* px;
+    long* pn;
+  }
+
+  struct Foo {
+      ...
+      void method(void) {}
+  };
+  shared_ptr<Foo> sp(new Foo);
+  Foo f(*sp);// operator*
+  sp->method();// operator->， 变成 px->method()
+  // 注意这里，箭头符号消耗掉以后，在C++里面，得到箭头符号，消耗掉了，会继续用箭头符号继续作用下去。
+  ```
+- member template，成员模板
+  ```C++
+  template <class T1, class T2>
+  struct pair {
+      typedef T1 first_type;
+      typedef T2 second_type;
+
+      T1 first;
+      T2 second;
+
+      pair() : first(T1()), second(T2()) {}
+      pair(const T1& a, const T2& b) : first(a), second(b) {}
+
+      template <class U1, class U2> pair(const pair<U1, U2>& p) : first(p.first), second(p.second) {}  // 成员模板
+  }
+
+  // 用处：
+  pair<Derived1, Derived2> p;
+  pair<Base1, Base2> p2(p);
+
+  -->
+  pair<Base1, Base2> p2(pair<Derived1, Derived2>());
+  //   ^~~~~  ^~~~~          ^~~~~~~~  ^~~~~~~~
+  //     T1     T2               U1         U2
+  // 可以把 p2 的初值赋值给 p，只要 p2 的类型 U1, U2 可以转换为 T1 和 T2. 
+  // C++中，子类可以转换为父类，父类不可转换为子类
+  ```
+- template template parameter, 模板模板参数
+  ```C++
+  // 允许用户第二参数传入一个模版
+  template<typename T, template<typename T> class Container> class XCls {
+  private:
+    Container<T> c;
+  public: 
+    ...
+  };
+  template<typename T> using Lst = list<T, allocator<T>>;
+  XCls<string, Lst> mylst; 
+  // 注意不能传XCls<string, std::list> mylst; 此处默认参数不起作用
+  ```
+- variadic templates 
+  ```C++
+  void print() {}
+  template<typename T, typename... Types> 
+  void print(const T& firstArg, const Types&... args) {
+      cout << firstArg << endl;
+      print(args...);
+  }
+  ```
+- 对于引用，编译器底部都是通过一根指针实现的，但要制造假象，所以size of reference和指代的对象一致，且对reference取地址，得到的和原对象也一致
+- 参数传递时，以下被视为same signature:
+  ```C++
+  double imag(const double& im) {}
+  double imag(const double im) {}
+  ```
+  函数后面的const会被视为函数签名的一部分，可以并存，同时存在时，非const对象会调用没有const签名的函数，const对象会调用有const签名的函数
+  ```C++
+  double imag(const double& im) {}
+  double imag(const double im) const {}
+  ```
+  但变量上的const不会影响函数签名。故以下的函数不能并存
+  ```C++
+  double imag(const double& im) {}
+  double imag(double im) {}
+  ```
+- vptr(虚指针)和vtbl(虚函数表)
+  ![Alt text](img/OOP_vptr_vtbl.png)
+  - 对于有虚函数的对象，对象大小会比所有数据大小加起来还大4，对因为多了一根指针（虚指针，vprt）指向虚函数表。
+  - **动态绑定**：将调用过程与相应代码链接起来的行为，与给定的过程调用相关联的代码，只有在运行期间才可以知道。
+  - **静态绑定**（前期绑定）指程序运行前就知道方法是属于哪个类的，编译的时候可以连接到类中，定位这个方法
+  - 虚函数表存在于对象实例最前面的位置（为了保证正确取到虚函数的偏移量），所以可以通过对象实例的地址得到虚函数表，然后就可以遍历其中的函数指针
+  - 对于继承而言，虚函数表在父类，子类继承父类会将虚函数表指针也继承下来。
+  - vptr会经由vtbl找到对应的虚函数地址。vtbl里放的都是函数指针。每个类有几个虚函数，就虚函数表里就有几个指针，指向对应的函数。
+  - 子类会继承父类的虚函数表，而且虚函数表里的函数指针指向地址不变，与父类虚函数指向相同的地址，即子类和父类共享虚函数。
+  - 如果子类重写了父类的方法，子类对象中没有重写的虚函数还是用父类的，但有重写的就会另外开辟一块空间，重新分配，虚函数中对应的指向也会变化
+  ```C++
+  (*(p->vptr)[n])(p);
+  // 此处顺序与虚函数定义顺序相同
+  ```
+  - **动态绑定的三个条件：（多态）**
+    1. 通过指针来调用
+    2. 指针可以向上转型（父类指针可以指向子类）
+    3. 调用的是虚函数
+   - 多态：可以通过父类指针调用子类对象（多态=虚函数表=动态绑定）
+  - 虚函数用法：多态，或模板方法（Template method）
+- this pointer:
+  对每一个对象，this pointer指向自己本身的地址。用Template Method的例子，当函数调用到Serialize()函数的时候，会通过this指针调用（成员函数都是通过this指针调用），然后this是一个指向子类的指针，符合向上转型，而且Serialize函数又是一个虚函数，所以这里会通过动态绑定来调用对应的函数。
+  ```C++
+  Serialize();
+  -->
+  this->Serialize();        // this是一个指向myDoc的指针，Serialize虚函数定义在父类CDocyment里，通过子类对象调用父类方法，所以这里有向上转型，将指向子类的指针传到父类的函数里面，充当父类成员函数里的this，需要转型。
+  (*(this->vptr)[n])(this); // 子类中重新定义了Serialize函数，所以根据虚函数表，会调用子类的函数
+  ```
+- 重载operator new, operator new[], operator delete and operator delete[]
+
+记得回来补
