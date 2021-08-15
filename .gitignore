@@ -1,1 +1,5 @@
-Project1/
+
+!*.*
+.vscode/
+./linux_programming/.vscode
+.gitignore
