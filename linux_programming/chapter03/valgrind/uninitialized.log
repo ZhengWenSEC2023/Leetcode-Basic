@@ -1,0 +1,133 @@
+==00:00:00:00.000 20554== Memcheck, a memory error detector
+==00:00:00:00.000 20554== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==00:00:00:00.001 20554== Using Valgrind-3.15.0-608cb11914-20190413 and LibVEX; rerun with -h for copyright info
+==00:00:00:00.001 20554== Command: ./uninitialized_test
+==00:00:00:00.002 20554== Parent PID: 19598
+==00:00:00:00.002 20554== 
+--00:00:00:00.002 20554-- 
+--00:00:00:00.002 20554-- Valgrind options:
+--00:00:00:00.002 20554--    --tool=memcheck
+--00:00:00:00.002 20554--    --show-reachable=yes
+--00:00:00:00.002 20554--    --read-var-info=yes
+--00:00:00:00.002 20554--    --verbose
+--00:00:00:00.002 20554--    --error-limit=yes
+--00:00:00:00.002 20554--    --time-stamp=yes
+--00:00:00:00.002 20554--    --leak-check=full
+--00:00:00:00.002 20554--    --log-file=mycode.log
+--00:00:00:00.002 20554-- Contents of /proc/version:
+--00:00:00:00.002 20554--   Linux version 5.11.0-25-generic (buildd@lgw01-amd64-038) (gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0, GNU ld (GNU Binutils for Ubuntu) 2.34) #27~20.04.1-Ubuntu SMP Tue Jul 13 17:41:23 UTC 2021
+--00:00:00:00.002 20554-- 
+--00:00:00:00.002 20554-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-rdrand
+--00:00:00:00.002 20554-- Page sizes: currently 4096, max supported 4096
+--00:00:00:00.002 20554-- Valgrind library directory: /usr/lib/x86_64-linux-gnu/valgrind
+--00:00:00:00.002 20554-- Reading syms from /home/linux/free-time/linux_programming/chapter03/valgrind/uninitialized_test
+--00:00:00:00.002 20554-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-2.31.so
+--00:00:00:00.003 20554--   Considering /usr/lib/x86_64-linux-gnu/ld-2.31.so ..
+--00:00:00:00.003 20554--   .. CRC mismatch (computed 975d0390 wanted 30bd717f)
+--00:00:00:00.003 20554--   Considering /lib/x86_64-linux-gnu/ld-2.31.so ..
+--00:00:00:00.004 20554--   .. CRC mismatch (computed 975d0390 wanted 30bd717f)
+--00:00:00:00.005 20554--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.31.so ..
+--00:00:00:00.022 20554--   .. CRC is valid
+--00:00:00:00.204 20554-- warning: addVar: unknown size (buf)
+--00:00:00:00.204 20554-- warning: addVar: unknown size (buf)
+--00:00:00:00.205 20554-- warning: addVar: unknown size (buf)
+--00:00:00:00.205 20554-- warning: addVar: unknown size (buf)
+--00:00:00:00.205 20554-- warning: addVar: unknown size (buf)
+--00:00:00:00.206 20554-- warning: addVar: unknown size (buf)
+--00:00:00:00.206 20554-- warning: addVar: unknown size (buf)
+--00:00:00:00.206 20554-- warning: addVar: unknown size (loadcmds)
+--00:00:00:00.206 20554-- warning: addVar: unknown size (loadcmds)
+--00:00:00:00.206 20554-- warning: addVar: unknown size (loadcmds)
+--00:00:00:00.210 20554-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/memcheck-amd64-linux
+--00:00:00:00.210 20554--    object doesn't have a symbol table
+--00:00:00:00.210 20554--    object doesn't have a dynamic symbol table
+--00:00:00:00.217 20554-- Scheduler: using generic scheduler lock implementation.
+--00:00:00:00.219 20554-- Reading suppressions file: /usr/lib/x86_64-linux-gnu/valgrind/default.supp
+==00:00:00:00.220 20554== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-20554-by-linux-on-???
+==00:00:00:00.221 20554== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-20554-by-linux-on-???
+==00:00:00:00.221 20554== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-20554-by-linux-on-???
+==00:00:00:00.221 20554== 
+==00:00:00:00.221 20554== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==00:00:00:00.221 20554== don't want to do, unless you know exactly what you're doing,
+==00:00:00:00.221 20554== or are doing some strange experiment):
+==00:00:00:00.221 20554==   /usr/lib/x86_64-linux-gnu/valgrind/../../bin/vgdb --pid=20554 ...command...
+==00:00:00:00.222 20554== 
+==00:00:00:00.222 20554== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==00:00:00:00.222 20554==   /path/to/gdb ./uninitialized_test
+==00:00:00:00.222 20554== and then give GDB the following command
+==00:00:00:00.222 20554==   target remote | /usr/lib/x86_64-linux-gnu/valgrind/../../bin/vgdb --pid=20554
+==00:00:00:00.222 20554== --pid is optional if only one valgrind process is running
+==00:00:00:00.222 20554== 
+--00:00:00:00.231 20554-- REDIR: 0x4022e10 (ld-linux-x86-64.so.2:strlen) redirected to 0x580c9ce2 (???)
+--00:00:00:00.244 20554-- REDIR: 0x4022be0 (ld-linux-x86-64.so.2:index) redirected to 0x580c9cfc (???)
+--00:00:00:00.255 20554-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_core-amd64-linux.so
+--00:00:00:00.257 20554--    object doesn't have a symbol table
+--00:00:00:00.263 20554-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so
+--00:00:00:00.264 20554--    object doesn't have a symbol table
+==00:00:00:00.265 20554== WARNING: new redirection conflicts with existing -- ignoring it
+--00:00:00:00.265 20554--     old: 0x04022e10 (strlen              ) R-> (0000.0) 0x580c9ce2 ???
+--00:00:00:00.266 20554--     new: 0x04022e10 (strlen              ) R-> (2007.0) 0x0483f060 strlen
+--00:00:00:00.268 20554-- REDIR: 0x401f5f0 (ld-linux-x86-64.so.2:strcmp) redirected to 0x483ffd0 (strcmp)
+--00:00:00:00.270 20554-- REDIR: 0x4023370 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4843a20 (mempcpy)
+--00:00:00:00.278 20554-- Reading syms from /usr/lib/x86_64-linux-gnu/libc-2.31.so
+--00:00:00:00.278 20554--   Considering /usr/lib/x86_64-linux-gnu/libc-2.31.so ..
+--00:00:00:00.286 20554--   .. CRC mismatch (computed 86b78530 wanted e380f01c)
+--00:00:00:00.286 20554--   Considering /lib/x86_64-linux-gnu/libc-2.31.so ..
+--00:00:00:00.292 20554--   .. CRC mismatch (computed 86b78530 wanted e380f01c)
+--00:00:00:00.294 20554--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.31.so ..
+--00:00:00:00.370 20554--   .. CRC is valid
+--00:00:00:03.469 20554-- REDIR: 0x48fe600 (libc.so.6:memmove) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.470 20554-- REDIR: 0x48fd900 (libc.so.6:strncpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.471 20554-- REDIR: 0x48fe930 (libc.so.6:strcasecmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.472 20554-- REDIR: 0x48fd220 (libc.so.6:strcat) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.472 20554-- REDIR: 0x48fd960 (libc.so.6:rindex) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.473 20554-- REDIR: 0x48ffdd0 (libc.so.6:rawmemchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.473 20554-- REDIR: 0x491ae60 (libc.so.6:wmemchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.474 20554-- REDIR: 0x491a9a0 (libc.so.6:wcscmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.474 20554-- REDIR: 0x48fe760 (libc.so.6:mempcpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.475 20554-- REDIR: 0x48fe590 (libc.so.6:bcmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.475 20554-- REDIR: 0x48fd890 (libc.so.6:strncmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.476 20554-- REDIR: 0x48fd2d0 (libc.so.6:strcmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.476 20554-- REDIR: 0x48fe6c0 (libc.so.6:memset) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.477 20554-- REDIR: 0x491a960 (libc.so.6:wcschr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.478 20554-- REDIR: 0x48fd7f0 (libc.so.6:strnlen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.478 20554-- REDIR: 0x48fd3b0 (libc.so.6:strcspn) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.479 20554-- REDIR: 0x48fe980 (libc.so.6:strncasecmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.479 20554-- REDIR: 0x48fd350 (libc.so.6:strcpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.480 20554-- REDIR: 0x48fead0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.480 20554-- REDIR: 0x491c0d0 (libc.so.6:wcsnlen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.480 20554-- REDIR: 0x491a9e0 (libc.so.6:wcscpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.480 20554-- REDIR: 0x48fd9a0 (libc.so.6:strpbrk) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.481 20554-- REDIR: 0x48fd280 (libc.so.6:index) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.482 20554-- REDIR: 0x48fd7b0 (libc.so.6:strlen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.482 20554-- REDIR: 0x4906d20 (libc.so.6:memrchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.483 20554-- REDIR: 0x48fe9d0 (libc.so.6:strcasecmp_l) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.483 20554-- REDIR: 0x48fe550 (libc.so.6:memchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.483 20554-- REDIR: 0x491aab0 (libc.so.6:wcslen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.483 20554-- REDIR: 0x48fdc60 (libc.so.6:strspn) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.483 20554-- REDIR: 0x48fe8d0 (libc.so.6:stpncpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.483 20554-- REDIR: 0x48fe870 (libc.so.6:stpcpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.484 20554-- REDIR: 0x48ffe10 (libc.so.6:strchrnul) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.484 20554-- REDIR: 0x48fea20 (libc.so.6:strncasecmp_l) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--00:00:00:03.492 20554-- REDIR: 0x49e6490 (libc.so.6:__strrchr_avx2) redirected to 0x483ea10 (rindex)
+==00:00:00:03.499 20554== Conditional jump or move depends on uninitialised value(s)
+==00:00:00:03.500 20554==    at 0x109159: main (uninitialized_test.c:5)
+==00:00:00:03.501 20554== 
+--00:00:00:03.502 20554-- REDIR: 0x49e6660 (libc.so.6:__strlen_avx2) redirected to 0x483ef40 (strlen)
+--00:00:00:03.503 20554-- REDIR: 0x48f8260 (libc.so.6:malloc) redirected to 0x483b780 (malloc)
+--00:00:00:03.522 20554-- REDIR: 0x48f8850 (libc.so.6:free) redirected to 0x483c9d0 (free)
+==00:00:00:03.531 20554== 
+==00:00:00:03.531 20554== HEAP SUMMARY:
+==00:00:00:03.531 20554==     in use at exit: 0 bytes in 0 blocks
+==00:00:00:03.531 20554==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+==00:00:00:03.531 20554== 
+==00:00:00:03.532 20554== All heap blocks were freed -- no leaks are possible
+==00:00:00:03.532 20554== 
+==00:00:00:03.532 20554== Use --track-origins=yes to see where uninitialised values come from
+==00:00:00:03.532 20554== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+==00:00:00:03.533 20554== 
+==00:00:00:03.533 20554== 1 errors in context 1 of 1:
+==00:00:00:03.533 20554== Conditional jump or move depends on uninitialised value(s)
+==00:00:00:03.533 20554==    at 0x109159: main (uninitialized_test.c:5)
+==00:00:00:03.533 20554== 
+==00:00:00:03.533 20554== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)

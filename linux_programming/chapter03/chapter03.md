@@ -164,4 +164,58 @@ In subfunction: No, a != c
 - alloca() 函数：在栈中分配 size 个字节的空间，调用该函数的函数返回时会自动释放 alloca() 的空间，失败会返回 NULL
 - memcpy() 函数：将 src 地址的 n 个字节复制到 dst ，成功后返回 dst 的首指针，不对可能出现的多余目的空间进行处理
   - strncpy() 和 memcpy() 用法相似，但strncpy() 传入参数指针为 char* 类型， memcpy() 传入为 void* 类型
-- 
+- memchr() 函数：在一段内存空间中查找某个字符第一次出现的位置
+- memcmp() 函数：比较两个空间的前 n 个字节是否相等
+```C
+// defination of each function
+// malloc()
+void *malloc (size_t __size) __THROW __attribute_malloc__;
+// calloc()
+void *calloc (size_t __nmemb, size_t __size);
+// alloca()
+void *alloca(size_t __size) __THROW
+// memcpy()
+void *memcpy(void *__restrict __dest, __const void* __restrict __src, size_t __n);
+// bcopy()
+void bcopy(__const void *__src, void *__dest, size_t __n);
+// memmove()
+void *memmove(void *__dest, __const void *__src, size_t n);
+// memset()
+void *memset(void *__s, int __c, size_t __n) __THROW __nonnull((1));
+// memchr()
+void *memchr(__const void *__s, int __c, size_t __n);
+// memcmp()
+int memcmp(__const void *__s1, __const void *__s2, size_t n);
+```
+- pmap 命令可以用来查看进程内存占用情况
+```bash
+pmap -x $pid
+# Address    Kbytes    RSS           Dirty    Mode      Mapping
+# 虚拟地址    大小       常驻内存大小    状态信息   权限      加载的文件
+# Mapping 列, [ anon ] 为堆， [ stack ] 为栈
+```
+# 3.4 Linux 进程环境及系统限制
+## 3.4.1 进程与命令行选项及参数
+- getopt() 函数，解析命令行参数，顺序任意，用 optstring 参数来指定命令行参数格式，每执行一次，该函数会返回查找到的命令行输入的参数字符，并更新全局变量，出错返回-1
+  - 单个字符：表示该选项
+  - 单个字符后接一个冒号：表示该选项后必须跟一个参数，参数必须紧跟在选项后，或以空格隔开
+  - 单个字符后接两个冒号：表示该选项后可以跟一个参数，也可以不跟参数。参数必须紧跟在字符后面，不能以空格隔开
+  - 用三个全局变量跟踪目前所用的命令行参数：
+    - optarg: 指向当前选项参数的指针
+    - optind: 再次调用 getopt() 时的下一个 argv 指针的索引
+    - optopt: 存储不可知或错误选项，如果 optstring 中或选项缺少必要的参数时，该选项存储在 optopt 中，getopt() 返回 '?'
+    - opterr: 是否向 stderr 输出错误信息， opterr = 0 不输出
+  - 程序运行结束后，如果发现不合法的参数，会将不合法的参数全部移到 argv[] 的末尾，optind 以此为起始值，遍历到 argc 即可得到全部不合法的输入参数
+- getlongopt() 函数：解析命令行参数，可以带对应的长命令行参数
+## 3.4.2 进程与环境变量
+- main() 函数的第三个变量会标识当前进程的环境变量列表
+```C
+// get value of env with name __name
+extern char* getenv(__const char* __name);
+// add new env with format string "NAME=VALUE"
+extern int putenv(char *__string);
+// set env with name=value, __replace means force overwrite (!0) or not (0)
+extern int setenv(__const char *__name, __const char *__value, int __replace);
+// delete env with name
+extern int unsetenv(__const char *__name);
+```
